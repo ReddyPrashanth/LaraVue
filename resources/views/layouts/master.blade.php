@@ -47,9 +47,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
-      <img src="./images/brightkite.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+      <img src="./images/lara_vue.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
            style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Lara Vue</span>
     </a>
 
     <!-- Sidebar -->
@@ -94,6 +94,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </li>
 
             </ul>
+          </li>
+          <li class="nav-item">
+                <router-link to="/developer" active-class="active" class="nav-link">
+                <i class="nav-icon fas fa-cog"></i>
+                <p>
+                   Developer
+                </p>
+                </router-link>
           </li>
           <li class="nav-item">
                 <router-link to="/profile" active-class="active" class="nav-link">
@@ -142,6 +150,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div class="content">
       <div class="container-fluid">
        <router-view></router-view>
+
+       <vue-progress-bar></vue-progress-bar>
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->

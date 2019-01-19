@@ -11,8 +11,56 @@ window.Vue = require('vue');
 
 import {router} from './router.js';
 import { Form, HasError,AlertError,AlertErrors, AlertSuccess} from 'vform';
+import VueProgressBar from 'vue-progressbar';
+import moment from 'moment';
+import Swal from 'sweetalert2';
 
 window.Form = Form;
+window.Swal = Swal;
+
+// Global Filters
+
+Vue.filter('upText', (value) => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+});
+
+Vue.filter('date',(value) => {
+    return moment(value).format('MMMM Do YYYY');
+});
+
+// sweet alert
+
+const toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000
+  });
+
+  window.toast = toast;
+
+// vue packages
+
+const options = {
+  color: '#bffaf3',
+  failedColor: '#874b4b',
+  thickness: '5px',
+//   transition: {
+//     speed: '0.2s',
+//     opacity: '0.6s',
+//     termination: 300
+//   },
+//   autoRevert: true,
+//   location: 'left',
+//   inverse: false
+}
+
+Vue.use(VueProgressBar, options);
+
+// Event Bus
+
+window.eventBus = new Vue();
+
 
 /**
  * The following block of code may be used to automatically register your
@@ -26,10 +74,25 @@ window.Form = Form;
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component(HasError.name, HasError)
-Vue.component(AlertError.name, AlertError)
-Vue.component(AlertErrors.name, AlertErrors)
-Vue.component(AlertSuccess.name, AlertSuccess)
+Vue.component(HasError.name, HasError);
+Vue.component(AlertError.name, AlertError);
+Vue.component(AlertErrors.name, AlertErrors);
+Vue.component(AlertSuccess.name, AlertSuccess);
+
+Vue.component(
+    'passport-clients',
+    require('./components/passport/Clients.vue').default
+);
+
+Vue.component(
+    'passport-authorized-clients',
+    require('./components/passport/AuthorizedClients.vue').default
+);
+
+Vue.component(
+    'passport-personal-access-tokens',
+    require('./components/passport/PersonalAccessTokens.vue').default
+);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
