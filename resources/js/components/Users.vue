@@ -1,6 +1,9 @@
 <template>
    <div class="container">
-       <div class="row mt-5">
+       <div class class="row mt-4" v-if="!$gate.isAdmin()">
+           <not-found></not-found>
+       </div>
+       <div class="row mt-4" v-if="$gate.isAdmin()">
           <div class="col-12">
             <div class="card">
               <div class="card-header">
@@ -21,7 +24,7 @@
                     <th>Created At</th>
                     <th>Action</th>
                   </tr>
-                  <tr v-for="user in users" :key="user.id">
+                  <tr v-for="user in users.data" :key="user.id">
                     <td>{{user.id}}</td>
                     <td>{{user.name}}</td>
                     <td>{{user.email}}</td>
@@ -40,6 +43,9 @@
                 </tbody></table>
               </div>
               <!-- /.card-body -->
+              <div class="card-footer">
+                  <pagination :data="users" @pagination-change-page="getResults"></pagination>
+              </div>
             </div>
             <!-- /.card -->
           </div>
@@ -103,6 +109,11 @@
                 </div>
             </div>
         </div>
+   
+   
+   
+   
+   
    </div>
 </template>
 
@@ -124,8 +135,13 @@ export default {
         };
     },
     methods: {
+        getResults(page=1){
+            axios.get('api/user?page=' + page)
+				.then(response => {
+					this.users = response.data;
+				});
+        },
         addModal() {
-            console.log
             this.editMode = false;
             this.form.reset();
             $('#addNew').modal('show');
@@ -196,20 +212,31 @@ export default {
                     this.$Progress.finish();
                 })
                 .catch((error) => {
-
+                    this.$Progress.fail();
                 })
 
         },
         getUsers() {
-            axios.get('api/user').then(res => {
-                console.log(res.data.data);
-                this.users = res.data.data;
-            });
+            if(this.$gate.isAdmin()){
+                axios.get('api/user').then(res => {
+                    console.log(res.data.data);
+                    this.users = res.data;
+                });
+            }
         }
     },
     created() {
-        this.getUsers();
+         this.getUsers();
         eventBus.$on('afterCreate', () => this.getUsers());
+        eventBus.$on('searching', () => {
+            let query = 'api/findUser?q='+this.$parent.search;
+            axios.get(query)
+                .then(res => {
+                    this.users = res.data;
+                }).catch(error => {
+                    console.log(error);
+                })
+        })
     }
 }
 </script>

@@ -9,7 +9,7 @@
                 <h5 class="widget-user-desc">Web Designer</h5>
               </div>
               <div class="widget-user-image">
-                <img class="img-circle" src="" alt="User Avatar">
+                <img class="img-circle" :src="getProfilePhoto()" alt="User Avatar">
               </div>
               <div class="card-footer">
                 <div class="row">
@@ -58,54 +58,72 @@
                       <h2 class="text-center">Display User Activity</h2>
                   </div>
                   <div class="tab-pane" id="settings">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" @submit.prevent="updateProfile">
                       <div class="form-group">
-                        <label for="inputName" class="col-sm-2 control-label">Name</label>
+                        <label for="name" class="col-sm-2 control-label">Name</label>
 
                         <div class="col-sm-10">
-                          <input type="email" class="form-control" id="inputName" placeholder="Name">
+                         <input v-model="form.name" type="text" name="name"
+                                class="form-control"
+                                placeholder="Name">
                         </div>
+
                       </div>
                       <div class="form-group">
                         <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
                         <div class="col-sm-10">
-                          <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                          <input type="email"
+                          v-model="form.email"
+                          class="form-control"
+
+                          id="inputEmail" placeholder="Email">
                         </div>
+
                       </div>
                       <div class="form-group">
-                        <label for="inputName2" class="col-sm-2 control-label">Name</label>
+                        <label for="bio" class="col-sm-2 control-label">Bio</label>
 
                         <div class="col-sm-10">
-                          <input type="text" class="form-control" id="inputName2" placeholder="Name">
+                          <textarea class="form-control"
+                          v-model="form.bio"
+                          id="bio"
+                          placeholder="Short bio for User"></textarea>
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
-
-                        <div class="col-sm-10">
-                          <textarea class="form-control" id="inputExperience" placeholder="Experience"></textarea>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="inputSkills" class="col-sm-2 control-label">Skills</label>
-
-                        <div class="col-sm-10">
-                          <input type="text" class="form-control" id="inputSkills" placeholder="Skills">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                          <div class="checkbox">
-                            <label>
-                              <input type="checkbox"> I agree to the <a href="#">terms and conditions</a>
-                            </label>
+                          <label for="type" class="col-sm-2 control-label">Type</label>
+                          <div class="col-sm-10">
+                               <select v-model="form.type"
+                               class="form-control">
+                            <option value="">Select User Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">Standard User</option>
+                            <option value="author">Author</option>
+                          </select>
                           </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="photo" class="col-sm-2 control-label">Profile Photo</label>
+
+                        <div class="col-sm-10">
+                          <input type="file" @change="updateProfilePic" name="photo">
+
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="password" class="col-sm-2 control-label">Password</label>
+
+                        <div class="col-sm-10">
+                          <input type="password"
+                          v-model="form.password"
+                          class="form-control"
+                          id="password" placeholder="password">
                         </div>
                       </div>
                       <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                          <button type="submit" class="btn btn-danger">Submit</button>
+                          <button type="submit" class="btn btn-danger">Update</button>
                         </div>
                       </div>
                     </form>
@@ -123,6 +141,66 @@
 
 <script>
 export default {
+    data() {
+        return {
+            form: new Form({
+                 id: '',
+                name: '',
+                email: '',
+                password: '',
+                type: '',
+                bio: '',
+                photo: ''
+            })
+        }
+    },
+    methods: {
+        getProfilePhoto(){
+            let photo = (this.form.photo.length > 100) ? this.form.photo : "images/profile/"+this.form.photo;
+            return photo;
+        },
+        updateProfile() {
+            axios.put('api/profile', this.form)
+                .then(res => {
+                    console.log(res);
+                    eventBus.$emit('afterCreate');
+                }).catch(error => {
+
+                })
+        },
+        updateProfilePic(e){
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            console.log(file);
+            if(file['size'] <= 2111775){
+                 reader.onloadend = (file) => {
+                // console.log('RESULT', reader.result)
+                this.form.photo = reader.result;
+                }
+                reader.readAsDataURL(file);
+            }else{
+                 Swal(
+                        'Oops!',
+                        'Your profile is greater than 2 MB.',
+                        'warning'
+                    )
+            }
+
+        },
+        getProfile() {
+            axios.get('api/profile')
+            .then(res => {
+                console.log(res.data);
+                this.form = res.data;
+            }).catch(error => {
+
+            })
+        }
+    },
+    created() {
+        this.getProfile();
+        eventBus.$on('afterCreate', () => this.getProfile());
+    }
 
 }
 </script>

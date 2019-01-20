@@ -12,11 +12,18 @@ window.Vue = require('vue');
 import {router} from './router.js';
 import { Form, HasError,AlertError,AlertErrors, AlertSuccess} from 'vform';
 import VueProgressBar from 'vue-progressbar';
+import NotFound from './components/NotFound.vue';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import Gate from './Gate.js'
+// import VeeValidate from 'vee-validate';
 
 window.Form = Form;
 window.Swal = Swal;
+
+// Vue Prototypes
+
+Vue.prototype.$gate = new Gate(window.user);
 
 // Global Filters
 
@@ -56,10 +63,14 @@ const options = {
 }
 
 Vue.use(VueProgressBar, options);
+// Vue.use(VeeValidate);
 
 // Event Bus
 
 window.eventBus = new Vue();
+
+
+
 
 
 /**
@@ -73,11 +84,13 @@ window.eventBus = new Vue();
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
 Vue.component(AlertErrors.name, AlertErrors);
 Vue.component(AlertSuccess.name, AlertSuccess);
+Vue.component('not-found', NotFound);
+Vue.component('pagination', require('laravel-vue-pagination'));
 
 Vue.component(
     'passport-clients',
@@ -94,6 +107,7 @@ Vue.component(
     require('./components/passport/PersonalAccessTokens.vue').default
 );
 
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -102,5 +116,13 @@ Vue.component(
 
 const app = new Vue({
     el: '#app',
-    router
+    router,
+    data: {
+        search: ''
+    },
+    methods: {
+        searchUsers: _.debounce(() => {
+            eventBus.$emit('searching');
+        }, 1000)
+    }
 });

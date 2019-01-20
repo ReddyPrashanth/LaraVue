@@ -1,5 +1,7 @@
 <template>
- <h1>Dashboard Component</h1>
+    <div class="container">
+        <not-found></not-found>
+    </div>
 </template>
 
 <script>
